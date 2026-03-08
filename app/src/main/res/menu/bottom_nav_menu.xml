@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_apps"
+        android:icon="@android:drawable/ic_menu_manage"
+        android:title="Apps" />
+    <item
+        android:id="@+id/nav_history"
+        android:icon="@android:drawable/ic_menu_recent_history"
+        android:title="History" />
+    <item
+        android:id="@+id/nav_notifications"
+        android:icon="@android:drawable/ic_menu_info_details"
+        android:title="Alerts" />
+    <item
+        android:id="@+id/nav_usage"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:title="Usage" />
+</menu>

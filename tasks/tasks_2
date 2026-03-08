@@ -1,0 +1,28 @@
+# implement google auth, get username from there itself.
+
+# guide me to remove public access to my firebase project.
+
+# once that is done, guide me to push it to github.
+
+
+
+
+If any of the mandatory permissions are changed, notify parent via push notification.
+
+The push notification content "Missing permissions: a,b,c", or "All permissions are allowed".
+
+
+ensure you are asking these permissions only if child mode is enabled. not for parent mode.
+only permission to send notifications should be asked in parent mode.
+
+
+child screen should also ask "allow restricted settings" permission.
+but that is not needed to be shown in child UI.
+
+Dont show "ShoGo" at top left of any screen.
+
+Review all the screens and make screens visually consistant across the app.
+
+In mode Screen, it should be like " I am " then 1 * 2 gird of buttons
+1. Parent
+2. Child

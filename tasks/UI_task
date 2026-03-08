@@ -1,0 +1,39 @@
+
+All pages are middle screen focused.
+
+first screen:
+mode choose
+
+parent flow:
+parining screen: 
+Ask name, child mobile ID,
+"Pair" button 
+
+parent dashboard screen:
+Welcome Username
+buttons: 2*3 grid, styled
+1. App Control
+2. Screen Time
+3. Notification History
+4. Web History (Browser + Youtube)
+5. Track Location
+6. Unpair (it goes to parining screen)
+
+
+
+
+child flow:
+
+reuse parining screen: 
+name
+show pair code (copyable/ have copy button) 
+"Pair" button
+
+child dashboard screen:
+Welcome Username
+status: active/inactive based on permissions granted
+show each permission status (granted/denied)
+
+
+
+

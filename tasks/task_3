@@ -1,0 +1,42 @@
+# In mode Screen, it should be like " I am " then 1 * 2 gird of buttons
+# 1. Parent
+# 2. Child
+
+# remove the voilet color top bar in all screens.
+
+# why did you remove notifications from parents dashboard? add it back.
+# but just show only notifications from other apps.
+
+
+# parent didnt receive nottification for  missing permissions "alert"
+
+# child app says accessibility service is not enabled, but clicking on "fix issues" takes to app info page instead.
+
+
+# improve seach bar
+
+
+# push notification should have the same content of the alert.
+
+# also if i manually diable accessibility service in child, will the parent see the notification for same?
+
+
+
+youtube history:
+/ 2:03
+Sponsored
+if i play a video from a playlist, it shows wrong title.
+it shows playlist name as youtube video, it is not needed.
+
+
+bring back top bar in all screens inside the parent dashboard.
+
+improve search bar UI
+
+it shows as app restriced in laucher, if i press go home from blocked app.
+
+app icon has to be round and not square in all possible places.
+
+analyse this app completely, find any bugs or performance issues. optimise anything if possible.
+----
+
