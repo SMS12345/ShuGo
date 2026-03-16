@@ -52,8 +52,7 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent(this, ParentDashboardActivity::class.java))
             }
         } else {
-            val username = AppModeManager.getUsername(this)
-            if (username.isEmpty()) {
+            if (!AppModeManager.isChildSetupDone(this)) {
                 startActivity(Intent(this, PairingActivity::class.java))
             } else {
                 KeepAliveService.start(this)

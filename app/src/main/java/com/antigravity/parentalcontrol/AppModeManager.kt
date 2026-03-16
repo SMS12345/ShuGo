@@ -9,6 +9,7 @@ object AppModeManager {
     private const val KEY_LINKED_ID = "linked_child_id"
     private const val KEY_DEVICE_ID = "device_id"
     private const val KEY_USERNAME = "user_name"
+    private const val KEY_CHILD_SETUP_DONE = "child_setup_done"
 
     // Fix #10: Cache mode to avoid hitting SharedPreferences on every accessibility event
     @Volatile
@@ -66,6 +67,16 @@ object AppModeManager {
     fun getUsername(context: Context): String {
         val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         return prefs.getString(KEY_USERNAME, "") ?: ""
+    }
+
+    fun setChildSetupDone(context: Context, done: Boolean) {
+        val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putBoolean(KEY_CHILD_SETUP_DONE, done).apply()
+    }
+
+    fun isChildSetupDone(context: Context): Boolean {
+        val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getBoolean(KEY_CHILD_SETUP_DONE, false)
     }
 
     /**

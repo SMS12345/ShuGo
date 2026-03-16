@@ -7,14 +7,29 @@ import com.antigravity.parentalcontrol.models.AppInfo
 
 object AppListProvider {
 
-    // Fix #11: Blocklist of truly unwanted system entries instead of hiding all system apps
+    // Blocklist of system entries that have launcher intents but are not meaningful to block
     private val BLOCKLIST = setOf(
+        // Core system noise (original)
         "com.android.settings",
         "com.android.systemui",
         "com.android.providers.settings",
         "com.android.inputmethod.latin",
         "com.google.android.inputmethod.latin",
-        "com.android.shell"
+        "com.android.shell",
+        // Bug 4: Additional unwanted system apps
+        "com.android.vending",                        // Play Store
+        "com.google.android.apps.safetyhub",          // Personal Safety
+        "com.android.stk",                            // SIM Toolkit
+        "com.android.switchaccess",                   // Switch Access
+        "com.google.android.marvin.talkback",         // TalkBack / Switch Access
+        "com.android.traceur",                        // System Tracing
+        "com.samsung.android.app.switchwidget",       // Samsung Switch
+        "com.android.server.telecom",                 // Android Switch / Telecom
+        "com.google.android.apps.restore",            // Backup & Restore
+        "com.android.nfc",                            // NFC service
+        "com.android.soundrecorder",                  // Sound Recorder (OEM)
+        "com.android.cellbroadcastreceiver",          // Emergency alerts
+        "com.android.carrierconfig"                   // Carrier services UI
     )
 
     fun getInstalledApps(context: Context): List<AppInfo> {

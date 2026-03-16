@@ -73,7 +73,8 @@ class PairingActivity : AppCompatActivity() {
                 Toast.makeText(this, "Please enter a 6-digit code", Toast.LENGTH_SHORT).show()
             }
         } else {
-            // Child mode just finishes setup
+            // Mark child setup as complete so pairing screen is not shown again
+            AppModeManager.setChildSetupDone(this, true)
             startActivity(Intent(this, ChildDashboardActivity::class.java))
             finish()
         }

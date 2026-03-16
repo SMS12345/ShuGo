@@ -3,6 +3,7 @@ package com.antigravity.parentalcontrol.utils
 import android.content.ComponentName
 import android.content.Context
 import android.provider.Settings
+import androidx.core.app.NotificationManagerCompat
 import com.antigravity.parentalcontrol.services.UsageMonitoringService
 
 fun isAccessibilityServiceEnabled(context: Context): Boolean {
@@ -12,16 +13,10 @@ fun isAccessibilityServiceEnabled(context: Context): Boolean {
 }
 
 fun isNotificationListenerEnabled(context: Context): Boolean {
-    val pkgName = context.packageName
-    val flat = Settings.Secure.getString(context.contentResolver, "enabled_notification_listeners")
-    if (!flat.isNullOrEmpty()) {
-        val names = flat.split(":")
-        for (name in names) {
-            val componentName = ComponentName.unflattenFromString(name)
-            if (componentName != null && componentName.packageName == pkgName) {
-                return true
-            }
-        }
-    }
-    return false
+    // NotificationManagerCompat.getEnabledListenerPackages() is the correct public API.
+    // Reading Settings.Secure "enabled_notification_listeners" directly can return null
+    // on Android 12+ without READ_SECURE_SETTINGS, causing a false "denied" result.
+    return NotificationManagerCompat.getEnabledListenerPackages(context)
+        .contains(context.packageName)
 }
+

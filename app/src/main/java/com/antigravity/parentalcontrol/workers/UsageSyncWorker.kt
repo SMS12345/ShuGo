@@ -45,8 +45,8 @@ class UsageSyncWorker(context: Context, params: WorkerParameters) : Worker(conte
 
     private fun syncTodayUsage() {
         val usageStatsManager = applicationContext.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
-        
-        // Use IST timezone explicitly for day boundaries (Digital Wellbeing style)
+
+        // Use IST timezone for day boundaries (same as Digital Wellbeing)
         val istZone = TimeZone.getTimeZone("Asia/Kolkata")
         val calendar = Calendar.getInstance(istZone)
         calendar.set(Calendar.HOUR_OF_DAY, 0)
@@ -56,41 +56,71 @@ class UsageSyncWorker(context: Context, params: WorkerParameters) : Worker(conte
         val startTime = calendar.timeInMillis
         val endTime = System.currentTimeMillis()
 
-        // Use INTERVAL_BEST for accurate aggregation within IST day boundaries
-        val usageStats = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_BEST, startTime, endTime)
-        
+        // Bug 5 fix: use queryEvents() instead of queryUsageStats(INTERVAL_BEST).
+        // INTERVAL_BEST returns pre-aggregated buckets that can bleed yesterday's data
+        // into today. queryEvents() gives raw move-to-foreground/background events so
+        // we can sum only the foreground intervals that fall within today's IST window.
+        val events = usageStatsManager.queryEvents(startTime, endTime)
+        val event = android.app.usage.UsageEvents.Event()
+
+        // Map: safePackageName → accumulated foreground ms
         val dailyMap = mutableMapOf<String, Long>()
-        
+        // Map: safePackageName → timestamp when it moved to foreground
+        val foregroundStartMap = mutableMapOf<String, Long>()
+
         val pm = applicationContext.packageManager
-        
-        for (stat in usageStats) {
-            val packageName = stat.packageName
-            val timeInForeground = stat.totalTimeInForeground
-            
-            // Filter: Only capture usage if:
-            // 1. Time > 0
-            // 2. The app is a user-facing app (has a launcher intent in the package manager)
-            // 3. It's not our own app or the system UI
-            if (timeInForeground > 0 && 
-                packageName != applicationContext.packageName &&
-                packageName != "com.android.systemui" &&
-                !packageName.contains("launcher")) {
-                
-                val launchIntent = pm.getLaunchIntentForPackage(packageName)
-                if (launchIntent != null) {
-                    val safePackageName = packageName.replace(".", "_")
-                    val existingTime = dailyMap[safePackageName] ?: 0L
-                    dailyMap[safePackageName] = existingTime + timeInForeground
+
+        while (events.hasNextEvent()) {
+            events.getNextEvent(event)
+            val pkg = event.packageName ?: continue
+
+            // Only count user-facing apps with a launcher intent
+            if (pkg == applicationContext.packageName ||
+                pkg == "com.android.systemui" ||
+                pkg.contains("launcher")) continue
+
+            when (event.eventType) {
+                android.app.usage.UsageEvents.Event.MOVE_TO_FOREGROUND -> {
+                    foregroundStartMap[pkg] = event.timeStamp
+                }
+                android.app.usage.UsageEvents.Event.MOVE_TO_BACKGROUND -> {
+                    val fgStart = foregroundStartMap.remove(pkg) ?: continue
+                    val duration = event.timeStamp - fgStart
+                    if (duration > 0) {
+                        val safePkg = pkg.replace(".", "_")
+                        dailyMap[safePkg] = (dailyMap[safePkg] ?: 0L) + duration
+                    }
                 }
             }
         }
-        
-        if (dailyMap.isNotEmpty()) {
+
+        // Any app still in foreground at query time — count time up to now
+        val now = System.currentTimeMillis()
+        for ((pkg, fgStart) in foregroundStartMap) {
+            val duration = now - fgStart
+            if (duration > 0) {
+                val safePkg = pkg.replace(".", "_")
+                dailyMap[safePkg] = (dailyMap[safePkg] ?: 0L) + duration
+            }
+        }
+
+        // Filter: only keep apps that have a launcher intent and usage >= 1 second
+        val filtered = dailyMap.filter { (safePkg, ms) ->
+            if (ms < 1000L) return@filter false
+            val realPkg = safePkg.replace("_", ".")
+            try {
+                pm.getLaunchIntentForPackage(realPkg) != null
+            } catch (e: Exception) {
+                false
+            }
+        }
+
+        if (filtered.isNotEmpty()) {
             val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             sdf.timeZone = istZone
             val dateString = sdf.format(Date())
-            FirebaseRepository.uploadUsageStats(dateString, dailyMap)
-            Log.d("UsageSyncWorker", "Uploaded stats for ${dailyMap.size} valid applications.")
+            FirebaseRepository.uploadUsageStats(dateString, filtered)
+            Log.d("UsageSyncWorker", "Uploaded stats for ${filtered.size} valid applications.")
         } else {
             Log.d("UsageSyncWorker", "No usage data found to upload for today.")
         }

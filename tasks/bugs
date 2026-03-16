@@ -1,0 +1,9 @@
+1. in the  first screen, the app logs is not visible. it just shows purple in dark mode.
+2. child app never showed pairing screen.
+3. in child app permission list screen, "notification listener" always shows as denied.
+4. in parent app, in "app controls" screen, it shows following system apps which are not needed to be like
+  android switch, play store, personal safety, sim toolkit, switch access, system tracing, 
+5. in child app i dont think the screen time is captured correctly, it is shows yesterday's usage as today.
+it has to be in sync with IST zone. also it has to be updated for every 5 minutes to keep it realtime.
+6. the button in top right cornor, need not to be present in all screens in parent flow.
+remove it. keep it as a grid in parent dashboard itself.
